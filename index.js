@@ -1,0 +1,235 @@
+// Import Dependencies //
+import 'dotenv/config'
+import express from 'express'
+import cors from 'cors'
+import bodyParser from 'body-parser'
+import mongoose, {Schema} from 'mongoose'
+
+// Create App
+const app = express()
+
+app.use(cors())
+app.use(bodyParser.json())
+
+const port = process.env.PORT || 4000
+
+app.listen(port, () => {
+    console.log(`listening on port: ${port}`)
+})
+
+// Connect Database
+mongoose.connect(process.env.DATABASE_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+    .then(() => {
+      console.log('Connected to the database')
+    })
+    .catch((error) => {
+      console.error('Error connecting to the database:', error)
+    })
+  
+// Create Models and Schemas
+const userSchema = new mongoose.Schema({
+    userEmail: {
+        type: String,
+        required: true
+    },
+    lastLogin: {
+        type: Date,
+        required: true
+    }
+})
+const User = mongoose.model('user', userSchema)
+
+const fruitSchema = new mongoose.Schema({
+    name: String,
+    type: String,
+    character: String,
+    firstAppearance: String,
+    abilities: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+    }
+  })
+  
+  
+  const Fruit = mongoose.model('fruit', fruitSchema)
+
+// Create Middlewares //
+
+
+// Define backend routes //
+app.get ('/', async (req, res) => {
+    try {
+        res.json({
+            message: 'Hello fruit'
+        })
+    }
+    catch (error) {
+        console.error(error)
+        res.sendStatus(500).json({error: 'Page not loading'})
+    }
+})
+
+// Route to home page
+app.get('/fruits', async (req, res) => {
+    try {
+        const fruits = await Fruit.find() // Fetch all fruits from the database
+        res.status(200).json({ fruits })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: 'Internal server error' })
+    }
+})
+
+// Route to search fruits
+app.get('/fruits/list', async (req, res) => {
+    try {
+      const fruitList = await Fruit.find({})
+      res.status(200).json(fruitList)
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  })
+  
+// Route to single fruit view
+app.get('/fruits/:id', async (req, res) => {
+    try {
+      const fruitId = req.params.id
+      const fruit = await Fruit.findById(fruitId)
+  
+      if (!fruit) {
+        return res.status(404).json({ error: 'Fruit not found' })
+      }
+  
+      res.status(200).json(fruit)
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  })
+  
+
+// Add New Devil Fruit
+app.post('/fruits/add', async (req, res) => {
+    try {
+      // Check if the fruit already exists in the database
+      const existingFruit = await Fruit.findOne({ name: req.body.name });
+  
+      if (existingFruit) {
+        console.log('Devil Fruit is already in the collection');
+        res.status(400).json({ error: 'Devil Fruit already exists' });
+        return; // Exit the route handler
+      }
+  
+      // Find the user by their ID (you should provide the user ID in the request)
+      const user = await User.findById(req.body.userId);
+  
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      // Create a new Devil Fruit document and associate it with the user
+      const newFruit = new Fruit({
+        name: req.body.name,
+        type: req.body.type,
+        firstAppearance: req.body.firstAppearance,
+        abilities: req.body.abilities,
+        user: user._id, // Assign the user's ID
+      });
+  
+      await newFruit.save();
+      console.log('New Devil Fruit added:', newFruit);
+      res.status(201).json(newFruit); // Return the new Devil Fruit with a 201 status (Created)
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to add Devil Fruit' });
+    }
+  });
+  
+
+// Edit Fruit
+app.put('/fruits/update/:id', async (req, res) => {
+    const fruitId = req.params.id;
+  
+    try {
+      const updatedFruit = await Fruit.findByIdAndUpdate(
+        fruitId,
+        {
+          name: req.body.name,
+          type: req.body.type,
+          character: req.body.character,
+          user: req.body.user,
+          firstAppearance: req.body.firstAppearance,
+          abilities: req.body.abilities,
+        },
+        { new: true }
+      )
+  
+      if (!updatedFruit) {
+        return res.status(404).json({ error: 'Fruit not found' })
+      }
+  
+      res.json({ message: 'Fruit has been updated', updatedFruit })
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  })
+
+  app.delete('/fruits/:id', async (req, res) => {
+    try {
+      const fruitId = req.params.id
+      const deletedFruit = await Fruit.findByIdAndRemove(fruitId)
+  
+      if (!deletedFruit) {
+        return res.status(404).json({ error: 'Fruit not found' })
+      }
+  
+      res.status(200).json({ message: 'Fruit has been deleted' })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  })
+  
+  
+  
+
+//* Endpoints to attributes
+
+// For Types
+
+// Route to fetch Paramecia type fruits
+app.get('/fruits/type/:type', async (req, res) => {
+    try {
+      const parameciaFruits = await Fruit.find({ type: 'Paramecia' })
+  
+      res.status(200).json(parameciaFruits)
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  })
+  
+
+
+// User authentication
+app.post('/user/login', async (req, res) => {
+    const now = new Date()
+    if (await User.count({
+      'userEmail': req.body.email
+    }) === 0) {
+      const newUser = new User({userEmail: req.body.email, lastLogin:now})
+      newUser.save()
+      .then(() => {
+        res.sendStatus(200)
+      })
+    } else {
+      await User.findOneAndUpdate({'userEmail': req.body.email, lastLogin: now})
+      res.sendStatus(200)
+    }
+  })
