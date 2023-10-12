@@ -116,6 +116,7 @@ app.get('/fruits/:id', async (req, res) => {
 // Add New Devil Fruit
 app.post('/fruits/add', async (req, res) => {
     try {
+        console.log(req.body)
       // Check if the fruit already exists in the database
       const existingFruit = await Fruit.findOne({ name: req.body.name });
   
@@ -125,30 +126,31 @@ app.post('/fruits/add', async (req, res) => {
         return; // Exit the route handler
       }
   
-      // Find the user by their ID (you should provide the user ID in the request)
-      const user = await User.findById(req.body.userId);
-  
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-  
-      // Create a new Devil Fruit document and associate it with the user
-      const newFruit = new Fruit({
-        name: req.body.name,
-        type: req.body.type,
-        firstAppearance: req.body.firstAppearance,
-        abilities: req.body.abilities,
-        user: user._id, // Assign the user's ID
-      });
-  
-      await newFruit.save();
-      console.log('New Devil Fruit added:', newFruit);
-      res.status(201).json(newFruit); // Return the new Devil Fruit with a 201 status (Created)
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Failed to add Devil Fruit' });
+      // Find the user by their email 
+    const user = await User.findOne({ userEmail: req.body.user });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
+
+    // Create a new Devil Fruit document and associate it with the user
+    const newFruit = new Fruit({
+      name: req.body.name,
+      type: req.body.type,
+      firstAppearance: req.body.firstAppearance,
+      abilities: req.body.abilities,
+      user: user._id, // Assign the user's ID
+    });
+
+    await newFruit.save();
+    console.log('New Devil Fruit added:', newFruit);
+    res.status(201).json(newFruit); // Return the new Devil Fruit with a 201 status (Created)
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to add Devil Fruit' });
+  }
   });
+  
   
 
 // Edit Fruit
@@ -217,19 +219,30 @@ app.get('/fruits/type/:type', async (req, res) => {
   
 
 
+
 // User authentication
 app.post('/user/login', async (req, res) => {
-    const now = new Date()
-    if (await User.count({
-      'userEmail': req.body.email
-    }) === 0) {
-      const newUser = new User({userEmail: req.body.email, lastLogin:now})
-      newUser.save()
-      .then(() => {
-        res.sendStatus(200)
+    const now = new Date();
+    
+    const newUser = new User({ userEmail: req.body.email, lastLogin: now });
+    newUser.save()
+      .then((savedUser) => {
+        const userId = savedUser._id; // Obtain the MongoDB-generated user ID
+  
+        // Set the 'user_session' cookie with the obtained user ID.
+        const userSession = {
+          userId: userId,
+          // Other user session data
+        };
+  
+        const { cookies } = useCookies();
+        cookies.set('user_session', userSession);
+  
+        res.sendStatus(200);
       })
-    } else {
-      await User.findOneAndUpdate({'userEmail': req.body.email, lastLogin: now})
-      res.sendStatus(200)
-    }
-  })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to create a new user' });
+      });
+  });
+  
