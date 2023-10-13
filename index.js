@@ -57,7 +57,26 @@ const fruitSchema = new mongoose.Schema({
   
   const Fruit = mongoose.model('fruit', fruitSchema)
 
-// Create Middlewares //
+  const reviewSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        required: true
+    },
+    fruit: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'fruit',
+        required: true
+    },
+    rating: {
+        type: Number,
+        required: true
+    },
+    comment: String
+})
+
+const Review = mongoose.model('review', reviewSchema);
+
 
 
 // Define backend routes //
@@ -206,7 +225,7 @@ app.put('/fruits/update/:id', async (req, res) => {
 // For Types
 
 // Route to fetch Paramecia type fruits
-app.get('/fruits/type/:type', async (req, res) => {
+app.get('/fruits/type/paramecia', async (req, res) => {
     try {
       const parameciaFruits = await Fruit.find({ type: 'Paramecia' })
   
@@ -216,15 +235,70 @@ app.get('/fruits/type/:type', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' })
     }
   })
+  // Route to fetch Logia types
+  app.get('/fruits/type/logia', async (req, res) => {
+    try {
+      const LogiaFruits = await Fruit.find({ type: 'Logia' })
   
+      res.status(200).json(LogiaFruits)
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  })
+ // Route to fetch Zoan types
+ app.get('/fruits/type/zoan', async (req, res) => {
+    try {
+      const ZoanFruits = await Fruit.find({ type: 'Zoan' })
+  
+      res.status(200).json(ZoanFruits)
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  })
 
-
+  // Route to add a review
+  app.post('/fruits/reviews/add', async (req, res) => {
+    try {
+        const { user, fruit, rating, comment } = req.body;
+        const newReview = new Review({ user, fruit, rating, comment });
+        await newReview.save();
+        res.status(201).json(newReview);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to add review' });
+    }
+  });
+  
+  // Route to fetch reviews for a specific fruit
+  app.get('/fruits/:fruitId/reviews', async (req, res) => {
+    try {
+        const fruitId = req.params.fruitId;
+        const reviews = await Review.find({ fruit: fruitId });
+        res.status(200).json({ reviews });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+  // Route to list all reviews
+  app.get('/fruits/reviews', async (req, res) => {
+    try {
+        const reviews = await Review.find();
+        res.status(200).json({ reviews });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 
 // User authentication
 app.post('/user/login', async (req, res) => {
-    const now = new Date();
+    const now = new Date()
     
-    const newUser = new User({ userEmail: req.body.email, lastLogin: now });
+    const newUser = new User({ userEmail: req.body.email, lastLogin: now })
     newUser.save()
       .then((savedUser) => {
         const userId = savedUser._id; // Obtain the MongoDB-generated user ID
@@ -235,14 +309,14 @@ app.post('/user/login', async (req, res) => {
           // Other user session data
         };
   
-        const { cookies } = useCookies();
-        cookies.set('user_session', userSession);
+        const { cookies } = useCookies()
+        cookies.set('user_session', userSession)
   
-        res.sendStatus(200);
+        res.sendStatus(200)
       })
       .catch((error) => {
         console.error(error);
-        res.status(500).json({ error: 'Failed to create a new user' });
-      });
-  });
-  
+        res.status(500).json({ error: 'Failed to create a new user' })
+      })
+  })
+
