@@ -33,7 +33,9 @@ mongoose.connect(process.env.DATABASE_URL, {
 const userSchema = new mongoose.Schema({
     userEmail: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
+        index: true
     },
     lastLogin: {
         type: Date,
@@ -46,23 +48,15 @@ const fruitSchema = new mongoose.Schema({
     name: String,
     type: String,
     character: String,
-    firstAppearance: String,
     abilities: String,
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'user',
     }
   })
-  
-  
   const Fruit = mongoose.model('fruit', fruitSchema)
 
   const reviewSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'user',
-        required: true
-    },
     fruit: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'fruit',
@@ -156,7 +150,7 @@ app.post('/fruits/add', async (req, res) => {
     const newFruit = new Fruit({
       name: req.body.name,
       type: req.body.type,
-      firstAppearance: req.body.firstAppearance,
+      character: req.body.character,
       abilities: req.body.abilities,
       user: user._id, // Assign the user's ID
     });
@@ -175,7 +169,14 @@ app.post('/fruits/add', async (req, res) => {
 // Edit Fruit
 app.put('/fruits/update/:id', async (req, res) => {
     const fruitId = req.params.id;
-  
+    console.log(req.body.loggedInUser)
+    const fruitData =  await Fruit.findOne( {name: req.body.name })
+   if (fruitData) {
+    console.log(fruitData.user)
+   }
+   // compare the loggedin user with the user that created the fruit
+   // if they are not the same, throw an error saying this user is not authorised to edit this fruit, else update the fruit
+   
     try {
       const updatedFruit = await Fruit.findByIdAndUpdate(
         fruitId,
@@ -184,7 +185,7 @@ app.put('/fruits/update/:id', async (req, res) => {
           type: req.body.type,
           character: req.body.character,
           user: req.body.user,
-          firstAppearance: req.body.firstAppearance,
+        
           abilities: req.body.abilities,
         },
         { new: true }
@@ -223,7 +224,18 @@ app.put('/fruits/update/:id', async (req, res) => {
 //* Endpoints to attributes
 
 // For Types
-
+// app.get('/fruits/type/:type', async (req, res) => {
+//     try {
+//         const type = req.params.type;
+//         console.log(type)
+//       const fruitType = await Fruit.find({ type: type })
+  
+//       res.status(200).json(fruitType)
+//     } catch (error) {
+//       console.error(error)
+//       res.status(500).json({ error: 'Internal server error' })
+//     }
+//   })
 // Route to fetch Paramecia type fruits
 app.get('/fruits/type/paramecia', async (req, res) => {
     try {
@@ -238,9 +250,9 @@ app.get('/fruits/type/paramecia', async (req, res) => {
   // Route to fetch Logia types
   app.get('/fruits/type/logia', async (req, res) => {
     try {
-      const LogiaFruits = await Fruit.find({ type: 'Logia' })
+      const logiaFruits = await Fruit.find({ type: 'Logia' })
   
-      res.status(200).json(LogiaFruits)
+      res.status(200).json(logiaFruits)
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Internal server error' })
@@ -249,9 +261,9 @@ app.get('/fruits/type/paramecia', async (req, res) => {
  // Route to fetch Zoan types
  app.get('/fruits/type/zoan', async (req, res) => {
     try {
-      const ZoanFruits = await Fruit.find({ type: 'Zoan' })
+      const zoanFruits = await Fruit.find({ type: 'Zoan' })
   
-      res.status(200).json(ZoanFruits)
+      res.status(200).json(zoanFruits)
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Internal server error' })
@@ -259,20 +271,22 @@ app.get('/fruits/type/paramecia', async (req, res) => {
   })
 
   // Route to add a review
-  app.post('/fruits/reviews/add', async (req, res) => {
+  app.post('/fruits/:fruitId/reviews/add', async (req, res) => {
     try {
-        const { user, fruit, rating, comment } = req.body;
-        const newReview = new Review({ user, fruit, rating, comment });
+        const { fruitId, rating, comment } = req.body;
+        const newReview = new Review({ fruit: fruitId, rating, comment });
         await newReview.save();
         res.status(201).json(newReview);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to add review' });
     }
-  });
+});
+
   
-  // Route to fetch reviews for a specific fruit
-  app.get('/fruits/:fruitId/reviews', async (req, res) => {
+ 
+// Route to fetch reviews for a specific fruit
+app.get('/fruits/:fruitId/reviews', async (req, res) => {
     try {
         const fruitId = req.params.fruitId;
         const reviews = await Review.find({ fruit: fruitId });
@@ -281,10 +295,10 @@ app.get('/fruits/type/paramecia', async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
-  });
-  
-  // Route to list all reviews
-  app.get('/fruits/reviews', async (req, res) => {
+});
+
+// Route to list all reviews
+app.get('/fruits/reviews', async (req, res) => {
     try {
         const reviews = await Review.find();
         res.status(200).json({ reviews });
@@ -292,13 +306,17 @@ app.get('/fruits/type/paramecia', async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
-  });
+});
 
 // User authentication
 app.post('/user/login', async (req, res) => {
     const now = new Date()
-    
+    console.log(req.body.email)
+    // check if user exists, then save the session
+    // if the user does not exists create the user, then save the session
+    // 
     const newUser = new User({ userEmail: req.body.email, lastLogin: now })
+    console.log(newUser)
     newUser.save()
       .then((savedUser) => {
         const userId = savedUser._id; // Obtain the MongoDB-generated user ID
@@ -308,7 +326,7 @@ app.post('/user/login', async (req, res) => {
           userId: userId,
           // Other user session data
         };
-  
+        // find the correct way to acess the cookies
         const { cookies } = useCookies()
         cookies.set('user_session', userSession)
   
