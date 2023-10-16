@@ -7,7 +7,6 @@ import serverless from "serverless-http"
 
 
 const api = express()
-const router = Router()
 
 api.use(cors())
 api.use(bodyParser.json())
@@ -67,6 +66,7 @@ const fruitSchema = new mongoose.Schema({
 
 const Review = mongoose.model('review', reviewSchema);
 
+const router = Router()
 
 
 // Define backend routes //
@@ -81,7 +81,6 @@ router.get ('/', async (req, res) => {
         res.sendStatus(500).json({error: 'Page not loading'})
     }
 })
-
 // Route to home page
 router.get('/fruits', async (req, res) => {
     try {
