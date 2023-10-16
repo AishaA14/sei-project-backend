@@ -5,7 +5,9 @@ import bodyParser from 'body-parser'
 import mongoose, {Schema} from 'mongoose'
 import serverless from "serverless-http"
 
+
 const api = express()
+const router = Router()
 
 api.use(cors())
 api.use(bodyParser.json())
