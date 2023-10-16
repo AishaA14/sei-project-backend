@@ -12,7 +12,7 @@ const app = express()
 
 app.use(cors())
 app.use(bodyParser.json())
-app.use('/api/', router)
+
 const port = process.env.PORT || 4000
 
 app.listen(port, () => {
