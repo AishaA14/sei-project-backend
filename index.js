@@ -1,10 +1,9 @@
 // Import Dependencies //
 import 'dotenv/config'
-import express, { Router } from 'express'
+import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import mongoose, { Schema } from 'mongoose'
-import serverless from "serverless-http";
 // Create App
 const app = express()
 
@@ -339,5 +338,3 @@ app.post('/user/login', async (req, res) => {
             res.status(500).json({ error: 'Failed to create a new user' })
         })
 })
-
-export const handler = serverless(app);
