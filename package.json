@@ -9,6 +9,8 @@
   "author": "Aisha Ayinde",
   "license": "ISC",
   "dependencies": {
+    "@netlify/functions": "^2.3.0",
+    "@types/express": "^4.17.20",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
