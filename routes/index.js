@@ -1,3 +1,4 @@
+
 // Import Dependencies //
 import 'dotenv/config'
 import express from 'express'
@@ -12,6 +13,11 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
+const port = process.env.PORT || 4000
+
+app.listen(port, () => {
+    console.log(`listening on port: ${port}`)
+})
 
 // Connect Database
 mongoose.connect(process.env.DATABASE_URL, {
@@ -67,19 +73,34 @@ const reviewSchema = new mongoose.Schema({
 
 const Review = mongoose.model('review', reviewSchema);
 
+
+
+// Define backend routes //
+app.get('/', async (req, res) => {
+    try {
+        res.json({
+            message: 'Hello fruit'
+        })
+    }
+    catch (error) {
+        console.error(error)
+        res.sendStatus(500).json({ error: 'Page not loading' })
+    }
+})
+
 // Route to home page
-export const getFruits = async (req, res) => {
+app.get('/fruits', async (req, res) => {
     try {
         const fruits = await Fruit.find() // Fetch all fruits from the database
-        res.status(200).json({ fruits });
+        res.status(200).json({ fruits })
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error(error)
+        res.status(500).json({ error: 'Internal server error' })
     }
-};
+})
 
 // Route to search fruits
-export const listFruits = async (req, res) => {
+app.get('/fruits/list', async (req, res) => {
     try {
         const fruitList = await Fruit.find({})
         res.status(200).json(fruitList)
@@ -87,10 +108,10 @@ export const listFruits = async (req, res) => {
         console.error(error)
         res.status(500).json({ error: 'Internal server error' })
     }
-}
+})
 
 // Route to single fruit view
-export const getFruitsById = async (req, res) => {
+app.get('/fruits/:id', async (req, res) => {
     try {
         const fruitId = req.params.id
         const fruit = await Fruit.findById(fruitId)
@@ -104,11 +125,11 @@ export const getFruitsById = async (req, res) => {
         console.error(error)
         res.status(500).json({ error: 'Internal server error' })
     }
-}
+})
 
 
 // Add New Devil Fruit
-export const addFruit = async (req, res) => {
+app.post('/fruits/add', async (req, res) => {
     try {
         console.log(req.body)
         // Check if the fruit already exists in the database
@@ -143,12 +164,12 @@ export const addFruit = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Failed to add Devil Fruit' });
     }
-};
+});
 
 
 
 // Edit Fruit
-export const updateFruit = async (req, res) => {
+app.put('/fruits/update/:id', async (req, res) => {
     const fruitId = req.params.id;
     console.log(req.body.loggedInUser)
     const fruitData = await Fruit.findOne({ name: req.body.name })
@@ -181,9 +202,9 @@ export const updateFruit = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' })
     }
-}
+})
 
-export const deleteFruit =  async (req, res) => {
+app.delete('/fruits/:id', async (req, res) => {
     try {
         const fruitId = req.params.id
         const deletedFruit = await Fruit.findByIdAndRemove(fruitId)
@@ -197,7 +218,7 @@ export const deleteFruit =  async (req, res) => {
         console.error(error)
         res.status(500).json({ error: 'Internal server error' })
     }
-}
+})
 
 
 
@@ -218,7 +239,7 @@ export const deleteFruit =  async (req, res) => {
 //     }
 //   })
 // Route to fetch Paramecia type fruits
-export const getParameciaFruits = async (req, res) => {
+app.get('/fruits/type/paramecia', async (req, res) => {
     try {
         const parameciaFruits = await Fruit.find({ type: 'Paramecia' })
 
@@ -227,9 +248,9 @@ export const getParameciaFruits = async (req, res) => {
         console.error(error)
         res.status(500).json({ error: 'Internal server error' })
     }
-}
+})
 // Route to fetch Logia types
-export const getLogiaFruits =  async (req, res) => {
+app.get('/fruits/type/logia', async (req, res) => {
     try {
         const logiaFruits = await Fruit.find({ type: 'Logia' })
 
@@ -238,9 +259,9 @@ export const getLogiaFruits =  async (req, res) => {
         console.error(error)
         res.status(500).json({ error: 'Internal server error' })
     }
-}
+})
 // Route to fetch Zoan types
-export const getZoanFruits = async (req, res) => {
+app.get('/fruits/type/zoan', async (req, res) => {
     try {
         const zoanFruits = await Fruit.find({ type: 'Zoan' })
 
@@ -249,10 +270,10 @@ export const getZoanFruits = async (req, res) => {
         console.error(error)
         res.status(500).json({ error: 'Internal server error' })
     }
-}
+})
 
 // Route to add a review
-export const addReview = async (req, res) => {
+app.post('/fruits/:fruitId/reviews/add', async (req, res) => {
     try {
         const { fruitId, rating, comment } = req.body;
         const newReview = new Review({ fruit: fruitId, rating, comment });
@@ -262,12 +283,12 @@ export const addReview = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Failed to add review' });
     }
-};
+});
 
 
 
 // Route to fetch reviews for a specific fruit
-export const getFruitReview = async (req, res) => {
+app.get('/fruits/:fruitId/reviews', async (req, res) => {
     try {
         const fruitId = req.params.fruitId;
         const reviews = await Review.find({ fruit: fruitId });
@@ -276,40 +297,45 @@ export const getFruitReview = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
-};
+});
 
 // Route to list all reviews
-// app.get('/fruits/reviews', async (req, res) => {
-//     try {
-//         const reviews = await Review.find();
-//         res.status(200).json({ reviews });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Internal server error' });
-//     }
-// });
-
-
-// User authentication
-export const getUserLogin = async (req, res) => {
-    const now = new Date();
-    console.log(req.body.email);
-
-    // Check if the user exists, then save the session.
-    // If the user does not exist, create the user and then save the session.
+app.get('/fruits/reviews', async (req, res) => {
     try {
-        const user = await User.findOne({ userEmail: req.body.email });
-
-        if (!user) {
-            // User not found, create a new user.
-            const newUser = new User({ userEmail: req.body.email, lastLogin: now });
-
-            await newUser.save();
-        }
-
-        res.sendStatus(200);
+        const reviews = await Review.find();
+        res.status(200).json({ reviews });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Failed to create a new user' });
+        res.status(500).json({ error: 'Internal server error' });
     }
-};
+});
+
+// User authentication
+app.post('/user/login', async (req, res) => {
+    const now = new Date()
+    console.log(req.body.email)
+    // check if user exists, then save the session
+    // if the user does not exists create the user, then save the session
+    // 
+    const newUser = new User({ userEmail: req.body.email, lastLogin: now })
+    console.log(newUser)
+    newUser.save()
+        .then((savedUser) => {
+            const userId = savedUser._id; // Obtain the MongoDB-generated user ID
+
+            // Set the 'user_session' cookie with the obtained user ID.
+            const userSession = {
+                userId: userId,
+                // Other user session data
+            };
+            // find the correct way to acess the cookies
+            const { cookies } = useCookies()
+            cookies.set('user_session', userSession)
+
+            res.sendStatus(200)
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).json({ error: 'Failed to create a new user' })
+        })
+})
