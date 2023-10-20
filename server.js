@@ -170,12 +170,22 @@ app.post('/fruits/add', async (req, res) => {
 
 // Edit Fruit
 app.put('/fruits/update/:id', async (req, res) => {
+    // let loggedInUserId = ''
+    // let fruitCreaterId = ''
     const fruitId = req.params.id;
-    console.log(req.body.loggedInUser)
-    const fruitData = await Fruit.findOne({ name: req.body.name })
-    if (fruitData) {
-        console.log(fruitData.user)
+    console.log('hello', req.body.loggedInUser, req.body.name)
+    const userData = await User.findOne({ userEmail: req.body.loggedInUser })
+    if (userData) {
+       loggedInUserId = userData._id 
+
     }
+    const fruitData = await Fruit.findOne({ name: req.body.name })
+    // if (fruitData) {
+    //     fruitCreaterId = fruitData.user
+    // }
+    // if (loggedInUserId  !== fruitCreaterId)
+    //     return res.status(400).json({ error: 'User not authorised to edit fruit' })
+
     // compare the loggedin user with the user that created the fruit
     // if they are not the same, throw an error saying this user is not authorised to edit this fruit, else update the fruit
 
