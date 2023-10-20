@@ -321,31 +321,58 @@ app.get('/fruits/reviews', async (req, res) => {
 });
 
 // User authentication
+// app.post('/user/login', async (req, res) => {
+//     const now = new Date()
+//     console.log(req.body.email)
+//     // check if user exists, then save the session
+//     // if the user does not exists create the user, then save the session
+//     // 
+//     const newUser = new User({ userEmail: req.body.email, lastLogin: now })
+//     console.log(newUser)
+//     newUser.save()
+//         .then((savedUser) => {
+//             const userId = savedUser._id; // Obtain the MongoDB-generated user ID
+
+//             // Set the 'user_session' cookie with the obtained user ID.
+//             const userSession = {
+//                 userId: userId,
+//                 // Other user session data
+//             };
+//             // find the correct way to acess the cookies
+//             // const { cookies } = useCookies()
+//             // cookies.set('user_session', userSession)
+
+//             // res.sendStatus(200)
+//         })
+//         .catch((error) => {
+//             console.error(error);
+//             res.status(500).json({ error: 'Failed to create a new user' })
+//         })
+// })
+
 app.post('/user/login', async (req, res) => {
-    const now = new Date()
-    console.log(req.body.email)
-    // check if user exists, then save the session
-    // if the user does not exists create the user, then save the session
-    // 
-    const newUser = new User({ userEmail: req.body.email, lastLogin: now })
-    console.log(newUser)
+   
+    const now = new Date();
+
+    const newUser = new User({ userEmail: req.body.email, lastLogin: now });
     newUser.save()
-        .then((savedUser) => {
-            const userId = savedUser._id; // Obtain the MongoDB-generated user ID
+      .then((savedUser) => {
+        const userId = savedUser._id; // Obtain the MongoDB-generated user ID
 
-            // Set the 'user_session' cookie with the obtained user ID.
-            const userSession = {
-                userId: userId,
-                // Other user session data
-            };
-            // find the correct way to acess the cookies
-            const { cookies } = useCookies()
-            cookies.set('user_session', userSession)
+        // Set the 'user_session' cookie with the obtained user ID.
+        const userSession = {
+          userId: userId,
+          // Other user session data
+        };
 
-            res.sendStatus(200)
-        })
-        .catch((error) => {
-            console.error(error);
-            res.status(500).json({ error: 'Failed to create a new user' })
-        })
-})
+        const { cookies } = useCookies();
+        cookies.set('user_session', userSession);
+
+        res.sendStatus(200);
+      })
+   
+.catch((error) => {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create a new user' });
+  });
+});
