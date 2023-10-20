@@ -350,29 +350,64 @@ app.get('/fruits/reviews', async (req, res) => {
 //         })
 // })
 
-app.post('/user/login', async (req, res) => {
+// app.post('/user/login', async (req, res) => {
    
-    const now = new Date();
+//     const now = new Date();
 
-    const newUser = new User({ userEmail: req.body.email, lastLogin: now });
-    newUser.save()
-      .then((savedUser) => {
-        const userId = savedUser._id; // Obtain the MongoDB-generated user ID
+//     const newUser = new User({ userEmail: req.body.email, lastLogin: now });
+//     newUser.save()
+//       .then((savedUser) => {
+//         const userId = savedUser._id; // Obtain the MongoDB-generated user ID
 
-        // Set the 'user_session' cookie with the obtained user ID.
+//         // Set the 'user_session' cookie with the obtained user ID.
+//         const userSession = {
+//           userId: userId,
+//           // Other user session data
+//         };
+
+//         const { cookies } = useCookies();
+//         cookies.set('user_session', userSession);
+
+//         res.sendStatus(200);
+//       })
+   
+// .catch((error) => {
+//     console.error(error);
+//     res.status(500).json({ error: 'Failed to create a new user' });
+//   });
+// });
+
+app.post('/user/login', async (req, res) => {
+    try {
+        // Check if a user with the given email already exists
+        const existingUser = await User.findOne({ userEmail: req.body.email });
+
+        if (existingUser) {
+            // User with this email already exists
+            return res.status(409).json({ error: 'User with this email already exists' });
+        }
+
+        // Create a new user
+        const now = new Date();
+        const newUser = new User({ userEmail: req.body.email, lastLogin: now });
+
+        await newUser.save();
+        
+        // Set the user session cookie
+        const userId = newUser._id;
         const userSession = {
-          userId: userId,
-          // Other user session data
+            userId: userId,
+            // Other user session data
         };
 
         const { cookies } = useCookies();
         cookies.set('user_session', userSession);
 
+        // Respond with success
         res.sendStatus(200);
-      })
-   
-.catch((error) => {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to create a new user' });
-  });
+    } catch (error) {
+        // Handle errors
+        console.error(error);
+        res.status(500).json({ error: 'Failed to create a new user' });
+    }
 });
