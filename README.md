@@ -8,7 +8,6 @@ The One Piece Orchard Backend is the server-side component of the One Piece Orch
 
 - [Deployment Link](#deployment-link)
 - [Features](#features)
-- [How to Play](#how-to-play)
 - [Installation](#installation)
 - [Timeframe & Working Team](#timeframe--working-team)
 - [Technologies Used](#technologies-used)
@@ -18,18 +17,10 @@ The One Piece Orchard Backend is the server-side component of the One Piece Orch
   - [Sketches and Diagrams](#sketches-and-diagrams)
   - [Logic Flow](#logic-flow)
 - [Build/Code Process](#buildcode-process)
-  - [Setting Up the Game Board](#setting-up-the-game-board)
-  - [Handling Snake Movement](#handling-snake-movement)
-  - [Game Over Conditions](#game-over-conditions)
 - [Challenges](#challenges)
   - [Technical Challenges](#technical-challenges)
-    - [Managing Snake Movement](#1-managing-snake-movement)
-    - [Game Over State Management](#2-game-over-state-management)
 - [Key Learnings/Takeaways](#key-learningstakeaways)
-- [Bugs](#bugs)
 - [Future Improvements](#future-improvements)
-
-
 
 ## Deployment Link
 
@@ -37,9 +28,48 @@ This repository is not deployed independently. It's an integral part of the One 
 
 ## Features
 
-- Classic Snake gameplay experience.
-- High score tracking.
-- Sound effects for interactions.
+The backend of The One Piece Orchard provides a robust set of features to support the functionality of the Devil Fruit catalog and user management. Here are the key features of the backend system:
+
+### 1. RESTful API
+
+- **API Endpoints**: The backend offers a set of well-defined RESTful API endpoints for managing Devil Fruits and user accounts, supporting CRUD (Create, Read, Update, Delete) operations.
+
+### 2. Devil Fruit Management
+
+- **Create Devil Fruits**: Users can create new Devil Fruit entries by sending POST requests to the appropriate API endpoint. The backend validates the input and stores the new entries in the database.
+
+- **Edit Devil Fruits**: Existing Devil Fruit entries can be updated using PUT requests. The backend ensures that only authorized users can modify these entries.
+
+- **Delete Devil Fruits**: Users can request the removal of Devil Fruits by sending DELETE requests. The backend confirms the action, and the corresponding Devil Fruit is removed from the catalog.
+
+### 3. User Management
+
+- **User Registration**: New users can create accounts by sending POST requests with their registration information. Passwords are securely hashed and stored in the database.
+
+- **User Authentication**: Registered users can log in by sending their credentials to the authentication endpoint. The backend verifies the user's identity and issues a session token upon successful authentication.
+
+- **User Session Management**: User sessions are maintained using session tokens, enabling user-specific interactions such as editing and deleting Devil Fruits. Sessions are secure and time-limited for added security.
+
+- **User Logout**: Users can log out by sending a logout request. The backend invalidates the session token, effectively ending the user's session.
+
+### 4. Authentication Middleware
+
+- **Protected Routes**: The backend employs authentication middleware to protect certain routes. Unauthorized access is restricted, ensuring that only authenticated users can perform specific actions, such as editing or deleting Devil Fruits.
+
+### 5. Database Integration
+
+- **MongoDB Database**: The backend integrates with a MongoDB database to store Devil Fruit entries and user account data securely. The data is organized and retrievable via API endpoints.
+
+### 6. Data Validation
+
+- **Input Validation**: The backend performs input validation to ensure that the data submitted by users is in the correct format and adheres to defined constraints. This helps maintain data integrity and security.
+
+### 7. Error Handling
+
+- **Comprehensive Error Handling**: The backend provides detailed error messages and status codes to assist frontend developers and users in diagnosing issues and improving the user experience.
+
+These features combine to create a powerful backend system that supports the frontend's functionality and user interaction. The backend ensures data consistency, user security, and smooth user experiences within The One Piece Orchard application.
+
 
 ## Installation
 
