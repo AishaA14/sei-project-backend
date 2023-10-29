@@ -94,7 +94,7 @@ This project was completed within a week, working independently.
 Backend: Node.js, Express.js
 Database: MongoDB
 Version Control: Git
-Development Tools: Visual Studio Code, Postman
+Development Tools: Visual Studio Code, Postman.
 
 ## Brief
 
@@ -102,21 +102,23 @@ The backend's main goal was to provide RESTful API endpoints for the frontend to
 
 ## Planning
 
-### Initial Steps
+### Entity Relationship Diagram and Schema
 
-Before diving into the code, I took some time to plan out the website. This planning stage was crucial for understanding how the website would work, defining its logic, and ensuring a smooth development process.
+To design the database structure for The One Piece Orchard backend, I utilized Lucidchart to create an Entity Relationship Diagram (ERD). This ERD helped me visualize and plan the relationships between key entities, such as users and devil fruits, as well as the schema for reviews. Here's a brief overview of the structure:
 
-### Sketches and Diagrams
+### Entity Relationship Diagram (ERD)
 
-I used Excalidraw, a collaborative whiteboard tool, to create visual sketches and diagrams that helped me visualize the website's components and user interactions. These sketches allowed me to map out the following key aspects of the website:
+We used Lucidchart to create an ERD that illustrates how different entities in our database are connected. Specifically, I focused on the relationship between users and devil fruits. This diagram was instrumental in ensuring the correct setup of relationships, foreign keys, and data flow.
 
-insert here
+### User-Devil Fruit Relationship
 
-### Logic Flow
+The ERD showcases the one-to-many relationship between users and devil fruits. Users can be associated with multiple devil fruits, and each devil fruit belongs to a single user. This relationship was vital in implementing user authentication and data security.
 
-insert
+### Review Schema
 
-[Excalidraw Diagram](excalidraw.png)
+In addition to the ERD, I defined the schema for reviews. Devil fruits can have multiple reviews associated with them, allowing users to share their thoughts and opinions. The review schema details the structure of review data, including fields such as the reviewer's name, rating, and comments.
+
+These visualizations served as a valuable reference throughout the development process, ensuring that our database accurately represents the relationships between users, devil fruits, and reviews. This approach streamlined the implementation of features like user authentication and the association of data in our backend.
 
 ## Build/Code Process
 
