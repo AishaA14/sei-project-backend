@@ -121,16 +121,28 @@ These visualizations served as a valuable reference throughout the development p
 
 ## Build/Code Process
 
-I developed the backend to handle CRUD operations for Devil Fruit entries, implemented user authentication and authorization, and ensured proper error handling. The code is well-structured and follows best practices.
+### Connecting to the Database
+I connected my backend to the MongoDB using Mongoose and set up error handling to ensure that connection is successful.
+
+```js
+mongoose.connect(process.env.DATABASE_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+    .then(() => {
+        console.log('Connected to the database')
+    })
+    .catch((error) => {
+        console.error('Error connecting to the database:', error)
+    })
+```
+
+### Creating Models and Schemas
 
 ## Challenges
 
 ### Technical Challenges
 
-### Wins
-
-[Highlight interesting problem-solving moments]
-[Discuss strong sections of code]
 
 ## Key Learnings/Takeaways
 
