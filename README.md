@@ -15,7 +15,6 @@ The One Piece Orchard Backend is the server-side component of the One Piece Orch
 - [Planning](#planning)
   - [Initial Steps](#initial-steps)
   - [Sketches and Diagrams](#sketches-and-diagrams)
-  - [Logic Flow](#logic-flow)
 - [Build/Code Process](#buildcode-process)
 - [Challenges](#challenges)
   - [Technical Challenges](#technical-challenges)
