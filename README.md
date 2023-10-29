@@ -13,11 +13,18 @@ The One Piece Orchard Backend is the server-side component of the One Piece Orch
 - [Technologies Used](#technologies-used)
 - [Brief](#brief)
 - [Planning](#planning)
-  - [Initial Steps](#initial-steps)
-  - [Sketches and Diagrams](#sketches-and-diagrams)
+  - [Entity Relationship Diagram and Schema](#entity-relationship-diagram-and-schema)
+  - [User-Devil Fruit Relationship](#user-devil-fruit-relationship)
+  - [Review Schema](#review-schema)
 - [Build/Code Process](#buildcode-process)
 - [Challenges](#challenges)
-  - [Technical Challenges](#technical-challenges)
+  - [Authentication and Authorization](#authentication-and-authorization)
+    - [User Sessions and Authentication Status](#user-sessions-and-authentication-status)
+  - [Route Handling](#route-handling)
+    - [Route Hierarchy](#route-hierarchy)
+    - [Route Conflicts](#route-conflicts)
+    - [Nested Routes](#nested-routes)
+    - [Route Guards](#route-guards)
 - [Key Learnings/Takeaways](#key-learningstakeaways)
 - [Future Improvements](#future-improvements)
 
@@ -229,8 +236,8 @@ Through this project, I improved my skills in building RESTful APIs with Node.js
 
 ## Future Improvements
 
-Implement caching for improved performance.
 Enhance security measures for user authentication.
+Implement admin and regular user roles.
 Add API documentation for developers.
 
 
