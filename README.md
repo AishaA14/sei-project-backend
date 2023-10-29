@@ -136,12 +136,91 @@ mongoose.connect(process.env.DATABASE_URL, {
         console.error('Error connecting to the database:', error)
     })
 ```
-
 ### Creating Models and Schemas
+I defined Mogoose models and schemas for the fruit, review and user data, establishing the structure of the data and their relationships.
+
+```js
+const userSchema = new mongoose.Schema({
+    // User schema fields
+})
+
+const User = mongoose.model('user', userSchema)
+
+const fruitSchema = new mongoose.Schema({
+    // Fruit schema fields
+})
+
+const Fruit = mongoose.model('fruit', fruitSchema)
+
+const reviewSchema = new mongoose.Schema({
+    // Review schema fields
+})
+
+const Review = mongoose.model('review', reviewSchema)
+```
+
+### Routes for Acessing Data
+I defined route handler endpoints for acessing data such as fetching fruit, adding new fruits and editing them. This also includes validation logic and interacts with the database to perform CRUD operations. these routes serve as the interface for the frontend to interact with the backend API.
+
+```js
+// Route to home page
+app.get('/', async (req, res) => {
+    // Handling home page route
+})
+
+// Route to add a new Devil Fruit
+app.post('/fruits/add', async (req, res) => {
+    // Handling the addition of a new Devil Fruit
+})
+
+// Edit Fruit
+app.put('/fruits/update/:id', async (req, res) => {
+    // Handling the editing of a fruit
+})
+
+// Route to delete a fruit
+app.delete('/fruits/:id', async (req, res) => {
+    // Handling the deletion of a fruit
+})
+```
 
 ## Challenges
 
-### Technical Challenges
+### Authentication and Authorization
+
+**Challenge: User Sessions and Authentication Status**
+- Verifying user identity and controlling access based on authentication status presented a challenge. I needed to seamlessly manage user sessions and communicate their authentication status accurately.
+
+**Solution:**
+- I integrated third-party authentication providers like Google to facilitate user login. Dynamic display of buttons and features was achieved to match users' privileges by checking their authentication status.
+
+### Route Handling
+
+**Challenge: Route Hierarchy**
+- Designing the route hierarchy and organizing routes for clarity and efficiency required careful planning. Different parts of the application had to be structured properly in terms of routes.
+
+**Solution:**
+- I established a well-structured route hierarchy that grouped related routes logically. This enhanced clarity, making it easier to maintain and expand the application.
+
+**Challenge: Route Conflicts**
+- Avoiding conflicts in routes, particularly when similar route paths led to different endpoints, was a challenge. I aimed to make sure routes were distinct and unambiguous.
+
+**Solution:**
+- By carefully designing and organizing routes, I minimized the chances of conflicts. Each route was configured to have a unique path and endpoint, reducing the risk of conflicts.
+
+**Challenge: Nested Routes**
+- Managing parent-child relationships in applications with nested routes was essential. I needed to ensure that nested routes functioned as expected and that their organization made sense.
+
+**Solution:**
+- I structured nested routes logically to mirror the application's features and their interdependencies. This made navigation intuitive and efficient for users.
+
+**Challenge: Route Guards**
+- Implementing route guards for authentication and authorization was essential. However, configuring guards to control access to specific routes or features required careful integration.
+
+**Solution:**
+- I integrated route guards to check user authentication status and role-based permissions. This ensured that only authorized users could access specific routes and features.
+
+In overcoming these challenges, I refined my development skills and implemented solutions that contribute to the smooth and secure operation of The One Piece Orchard.
 
 
 ## Key Learnings/Takeaways
